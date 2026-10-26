@@ -1,0 +1,63 @@
+@import 'tailwindcss';
+
+/* Paleta inspirada em barril de carvalho, âmbar e turfa */
+@theme {
+  --color-peat-950: #0f0b08;
+  --color-peat-900: #17110c;
+  --color-peat-800: #211912;
+  --color-peat-700: #2f241a;
+  --color-peat-600: #46372a;
+  --color-amber-glow: #d9a441;
+  --color-amber-deep: #b07a22;
+  --color-cream: #f3e9d8;
+  --color-muted: #b9a993;
+  --color-danger: #e0715c;
+  --color-ok: #7fb77e;
+
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-sans: 'DM Sans', system-ui, sans-serif;
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+  }
+  body {
+    @apply bg-peat-950 text-cream font-sans antialiased;
+    background-image: radial-gradient(ellipse at top, rgb(217 164 65 / 0.07), transparent 60%);
+    min-height: 100vh;
+  }
+  h1, h2, h3 {
+    @apply font-display tracking-wide;
+  }
+}
+
+/* Use sempre a classe base junto: "btn btn-primary" */
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-medium transition
+      disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-primary {
+    @apply bg-amber-glow text-peat-950 hover:bg-amber-deep;
+  }
+  .btn-ghost {
+    @apply border border-peat-600 text-cream hover:border-amber-glow hover:text-amber-glow;
+  }
+  .btn-danger {
+    @apply border border-danger/60 text-danger hover:bg-danger hover:text-peat-950;
+  }
+  .card {
+    @apply rounded-xl border border-peat-700 bg-peat-900/80;
+  }
+  .label {
+    @apply mb-1 block text-xs font-medium uppercase tracking-wider text-muted;
+  }
+  .input {
+    @apply w-full rounded-md border border-peat-600 bg-peat-800 px-3 py-2.5 text-sm text-cream
+      placeholder:text-muted/60 outline-none transition focus:border-amber-glow focus:ring-1 focus:ring-amber-glow;
+  }
+  .field-error {
+    @apply mt-1 text-xs text-danger;
+  }
+}

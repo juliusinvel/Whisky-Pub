@@ -2,7 +2,7 @@
 
 E-commerce full stack para venda de whisky, com painel administrativo (catálogo/estoque e pedidos) e área do cliente (catálogo, carrinho, endereço de entrega e pagamento via PIX).
 
-> **Status:** Etapa 1 — banco de dados e backend. O frontend (React) vem na Etapa 2.
+> **Status:** Etapas 1 e 2 concluídas — banco de dados, API e frontend React.
 
 ## Arquitetura
 
@@ -11,7 +11,7 @@ E-commerce full stack para venda de whisky, com painel administrativo (catálogo
 │  Frontend (SPA)      │ ───────────────────▶ │  API REST            │ ─────────────▶ │  PostgreSQL  │
 │  React + Vite        │                      │  Node.js + Express 5 │                └──────────────┘
 │  React Router        │ ◀─────────────────── │  Zod (validação)     │
-│  TanStack Query      │    imagens /uploads  │  JWT + bcrypt (auth) │──▶ QR Code PIX (BR Code)
+│  Context API         │    imagens /uploads  │  JWT + bcrypt (auth) │──▶ QR Code PIX (BR Code)
 │  Tailwind CSS        │                      │  Multer (upload)     │
 └──────────────────────┘                      └──────────────────────┘
 ```
@@ -24,7 +24,7 @@ E-commerce full stack para venda de whisky, com painel administrativo (catálogo
 | Validação | **Zod** | Mesmas regras podem ser reaproveitadas no frontend |
 | Autenticação | **JWT + bcrypt** | Stateless; níveis de acesso `ADMIN` e `CUSTOMER` no token |
 | Pagamento | **PIX BR Code** | Payload "copia e cola" real (padrão BCB) + QR Code; confirmação simulada |
-| Frontend | **React + Vite + Tailwind** | Etapa 2 |
+| Frontend | **React 19 + Vite + Tailwind CSS 4** | SPA rápida; React Router para as telas, carrinho salvo no navegador |
 
 ### Decisões importantes
 
@@ -56,15 +56,17 @@ Whisky-Pub/
 │           ├── products/       # catálogo público + CRUD admin
 │           ├── addresses/      # endereços de entrega do cliente
 │           └── orders/         # carrinho/checkout, PIX, pedidos (cliente e admin)
-└── frontend/                   # (Etapa 2) React + Vite
+└── frontend/                   # React + Vite + Tailwind
+    ├── vite.config.js          # proxy /api e /uploads → backend
     └── src/
-        ├── api/                # cliente HTTP (axios) com token
-        ├── contexts/           # AuthContext, CartContext
-        ├── components/         # layout, cards, rotas protegidas
+        ├── App.jsx             # rotas (loja, cliente logado, admin)
+        ├── api/client.js       # fetch com token JWT e tratamento de erros
+        ├── contexts/           # AuthContext (sessão), CartContext (carrinho)
+        ├── components/         # Layout, AgeGate (18+), ProductCard, AddressForm, ui
         └── pages/
-            ├── store/          # Catálogo, Produto, Carrinho, Checkout, Pagamento PIX, Meus pedidos
+            ├── store/          # Catálogo, Produto, Carrinho, Checkout, Pedido/PIX, Meus pedidos
             ├── auth/           # Login, Cadastro
-            └── admin/          # Produtos (lista/form), Pedidos
+            └── admin/          # Produtos (lista + formulário com imagem), Pedidos
 ```
 
 ## Banco de dados
@@ -182,7 +184,16 @@ npm install
 npx prisma migrate dev --name init   # cria as tabelas
 npm run db:seed                      # admin + whiskys de exemplo
 npm run dev                          # http://localhost:3333/api/health
+
+# 3. Frontend (em outro terminal)
+cd frontend
+npm install
+npm run dev                          # http://localhost:5173
 ```
+
+Entre com o e-mail/senha de `ADMIN_*` do `.env` para acessar o painel em `/admin`. Para comprar, crie uma conta de cliente em `/cadastro`.
+
+> Em produção, rode `npm run build` no frontend e sirva a pasta `dist/`. Se a API ficar em outro domínio, defina `VITE_API_URL=https://sua-api.com/api` antes do build.
 
 Testes do gerador PIX: `npm test`
 
@@ -204,8 +215,23 @@ curl -X POST localhost:3333/api/admin/products -H "Authorization: Bearer $TOKEN"
 
 O payload gerado segue o padrão BR Code do Banco Central e pode ser lido por apps de banco reais usando a chave definida em `PIX_KEY`. Como não há integração com um PSP, **a confirmação é simulada** (botão "Já paguei" na tela de pagamento) ou feita manualmente pelo admin. Para produção, troque a simulação por um webhook de um provedor (Mercado Pago, Efí, Asaas etc.) chamando `confirmPayment(orderId)`.
 
+## Telas
+
+| Área | Rota | O que faz |
+| --- | --- | --- |
+| Loja | `/` | Catálogo com busca, filtro por marca, ordenação e paginação |
+| Loja | `/produto/:id` | Detalhe do whisky, quantidade e "adicionar ao carrinho" |
+| Loja | `/carrinho` | Itens, quantidades e subtotal (salvo no navegador) |
+| Auth | `/login`, `/cadastro` | Login e cadastro com confirmação de 18+ |
+| Cliente | `/checkout` | Endereço (com preenchimento pelo CEP via ViaCEP), resumo com frete e confirmação |
+| Cliente | `/pedidos/:id` | QR Code PIX, copia e cola, contagem regressiva, "Já paguei" (simulação) e status |
+| Cliente | `/meus-pedidos` | Histórico de pedidos |
+| Admin | `/admin` | Lista de whiskys, ativar/desativar, excluir |
+| Admin | `/admin/produtos/novo` · `/:id` | Formulário com upload e prévia da imagem |
+| Admin | `/admin/pedidos` | Pedidos por status; confirmar PIX, enviar, entregar ou cancelar |
+
 ## Roadmap
 
 - [x] Etapa 1 — Banco de dados e API (auth, roles, catálogo, endereços, pedidos, PIX)
-- [ ] Etapa 2 — Frontend React: catálogo, carrinho, login, checkout, pagamento, admin
+- [x] Etapa 2 — Frontend React: catálogo, carrinho, login, checkout, pagamento, admin
 - [ ] Etapa 3 — Deploy, webhook PIX real, e-mails de confirmação
