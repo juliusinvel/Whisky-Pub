@@ -1,0 +1,11 @@
+node_modules/
+.env
+dist/
+build/
+coverage/
+*.log
+.DS_Store
+
+# imagens enviadas pelo admin (mantém só a pasta)
+backend/uploads/*
+!backend/uploads/.gitkeep

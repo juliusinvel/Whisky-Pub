@@ -1,0 +1,152 @@
+// Esquema do banco de dados do Whisky Pub
+// Docs: https://www.prisma.io/docs/orm/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  CUSTOMER
+}
+
+enum OrderStatus {
+  PENDING_PAYMENT // aguardando o PIX
+  PAID            // pagamento confirmado
+  SHIPPED         // enviado
+  DELIVERED       // entregue
+  CANCELED        // cancelado / PIX expirado
+}
+
+enum PaymentStatus {
+  PENDING
+  CONFIRMED
+  EXPIRED
+}
+
+enum PaymentMethod {
+  PIX
+}
+
+model User {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  role         Role     @default(CUSTOMER)
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  addresses Address[]
+  orders    Order[]
+
+  @@map("users")
+}
+
+model Address {
+  id           String   @id @default(uuid())
+  userId       String   @map("user_id")
+  label        String?  // "Casa", "Trabalho"...
+  cep          String   @db.VarChar(8) // só dígitos
+  street       String
+  number       String
+  complement   String?
+  neighborhood String
+  city         String
+  state        String   @db.Char(2) // UF
+  isDefault    Boolean  @default(false) @map("is_default")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("addresses")
+}
+
+model Product {
+  id          String   @id @default(uuid())
+  name        String
+  brand       String
+  ageYears    Int?     @map("age_years") // null = sem idade declarada (NAS)
+  description String
+  price       Decimal  @db.Decimal(10, 2)
+  stock       Int      @default(0)
+  imageUrl    String?  @map("image_url")
+  isActive    Boolean  @default(true) @map("is_active") // false = removido do catálogo
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  orderItems OrderItem[]
+
+  @@index([brand])
+  @@index([isActive])
+  @@map("products")
+}
+
+model Order {
+  id          String      @id @default(uuid())
+  code        Int         @unique @default(autoincrement()) // número amigável: #1001
+  userId      String      @map("user_id")
+  status      OrderStatus @default(PENDING_PAYMENT)
+  subtotal    Decimal     @db.Decimal(10, 2)
+  shippingFee Decimal     @map("shipping_fee") @db.Decimal(10, 2)
+  total       Decimal     @db.Decimal(10, 2)
+
+  // Cópia do endereço no momento da compra (o cliente pode editar/apagar depois)
+  shipCep          String  @map("ship_cep") @db.VarChar(8)
+  shipStreet       String  @map("ship_street")
+  shipNumber       String  @map("ship_number")
+  shipComplement   String? @map("ship_complement")
+  shipNeighborhood String  @map("ship_neighborhood")
+  shipCity         String  @map("ship_city")
+  shipState        String  @map("ship_state") @db.Char(2)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user    User        @relation(fields: [userId], references: [id])
+  items   OrderItem[]
+  payment Payment?
+
+  @@index([userId])
+  @@index([status])
+  @@map("orders")
+}
+
+model OrderItem {
+  id          String  @id @default(uuid())
+  orderId     String  @map("order_id")
+  productId   String  @map("product_id")
+  productName String  @map("product_name") // cópia do nome no momento da compra
+  unitPrice   Decimal @map("unit_price") @db.Decimal(10, 2) // cópia do preço
+  quantity    Int
+
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id])
+
+  @@index([orderId])
+  @@map("order_items")
+}
+
+model Payment {
+  id         String        @id @default(uuid())
+  orderId    String        @unique @map("order_id")
+  method     PaymentMethod @default(PIX)
+  status     PaymentStatus @default(PENDING)
+  amount     Decimal       @db.Decimal(10, 2)
+  txid       String        @unique // identificador da transação PIX
+  pixPayload String        @map("pix_payload") // "copia e cola"
+  expiresAt  DateTime      @map("expires_at")
+  paidAt     DateTime?     @map("paid_at")
+  createdAt  DateTime      @default(now()) @map("created_at")
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@map("payments")
+}
