@@ -25,9 +25,16 @@ function PixPayment({ order, onPaid, onCancel }) {
   const [error, setError] = useState('');
 
   async function copy() {
-    await navigator.clipboard.writeText(payment.pixPayload);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2500);
+    try {
+      await navigator.clipboard.writeText(payment.pixPayload);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    } catch {
+      // Navegador bloqueou a área de transferência: seleciona o código para copiar manualmente
+      const field = document.getElementById('pix-code');
+      field?.focus();
+      field?.select();
+    }
   }
 
   async function run(kind, fn) {
@@ -65,7 +72,7 @@ function PixPayment({ order, onPaid, onCancel }) {
       </ol>
 
       <div className="mt-6 flex gap-2">
-        <input className="input font-mono text-xs" readOnly value={payment.pixPayload} aria-label="Código PIX" />
+        <input id="pix-code" className="input font-mono text-xs" readOnly onFocus={(e) => e.target.select()} value={payment.pixPayload} aria-label="Código PIX" />
         <button className="btn btn-primary shrink-0" onClick={copy}>
           {copied ? 'Copiado!' : 'Copiar'}
         </button>
