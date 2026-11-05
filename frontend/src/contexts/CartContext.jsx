@@ -49,6 +49,7 @@ export function CartProvider({ children }) {
               productId: product.id,
               name: product.name,
               brand: product.brand,
+              ageYears: product.ageYears,
               price: product.price,
               imageUrl: product.imageUrl,
               stock: product.stock,

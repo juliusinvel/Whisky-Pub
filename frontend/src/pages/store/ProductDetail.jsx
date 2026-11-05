@@ -35,7 +35,7 @@ export default function ProductDetail() {
   return (
     <div className="grid gap-10 md:grid-cols-2">
       <div className="card aspect-square p-10">
-        <BottleImage src={product.imageUrl} alt={product.name} />
+        <BottleImage src={product.imageUrl} alt={product.name} product={product} />
       </div>
 
       <div>

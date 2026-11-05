@@ -24,7 +24,11 @@
   }
   body {
     @apply bg-peat-950 text-cream font-sans antialiased;
-    background-image: radial-gradient(ellipse at top, rgb(217 164 65 / 0.07), transparent 60%);
+    background-image: radial-gradient(
+      ellipse at top,
+      color-mix(in srgb, var(--color-amber-glow) 8%, transparent),
+      transparent 60%
+    );
     min-height: 100vh;
   }
   h1, h2, h3 {

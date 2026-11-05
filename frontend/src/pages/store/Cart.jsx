@@ -28,7 +28,7 @@ export default function Cart() {
           {items.map((item) => (
             <li key={item.productId} className="card flex gap-4 p-4">
               <Link to={`/produto/${item.productId}`} className="h-24 w-20 shrink-0 rounded-md bg-peat-800 p-2">
-                <BottleImage src={item.imageUrl} alt={item.name} />
+                <BottleImage src={item.imageUrl} alt={item.name} product={item} />
               </Link>
               <div className="flex flex-1 flex-col">
                 <p className="text-xs uppercase tracking-widest text-muted">{item.brand}</p>

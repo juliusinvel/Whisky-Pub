@@ -98,7 +98,7 @@ export default function AdminProducts() {
                   <td className="p-3">
                     <div className="flex items-center gap-3">
                       <div className="h-12 w-10 shrink-0 rounded bg-peat-800 p-1">
-                        <BottleImage src={p.imageUrl} alt="" />
+                        <BottleImage src={p.imageUrl} alt="" product={p} />
                       </div>
                       <div>
                         <p className="font-medium">{p.name}</p>

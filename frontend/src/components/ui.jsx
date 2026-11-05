@@ -1,3 +1,4 @@
+import BottleArt from './BottleArt';
 import { ORDER_STATUS } from '../lib/format';
 
 export function Spinner({ label = 'Carregando...' }) {
@@ -43,23 +44,12 @@ export function StatusBadge({ status }) {
   );
 }
 
-/** Imagem da garrafa, com um placeholder elegante quando não há foto */
-export function BottleImage({ src, alt, className = '' }) {
+/** Foto da garrafa; sem foto, mostra uma ilustração gerada a partir do produto */
+export function BottleImage({ src, alt, product, className = '' }) {
   if (src) {
     return <img src={src} alt={alt} loading="lazy" className={`h-full w-full object-contain ${className}`} />;
   }
-  return (
-    <div className={`flex h-full w-full items-center justify-center ${className}`} aria-label={alt}>
-      <svg viewBox="0 0 60 140" className="h-3/4 opacity-40" fill="none" aria-hidden="true">
-        <path
-          d="M24 4h12v26c0 6 14 12 14 30v68a8 8 0 0 1-8 8H18a8 8 0 0 1-8-8V60c0-18 14-24 14-30V4Z"
-          stroke="var(--color-amber-glow)"
-          strokeWidth="2"
-        />
-        <rect x="14" y="78" width="32" height="34" rx="2" stroke="var(--color-amber-glow)" strokeWidth="1.5" />
-      </svg>
-    </div>
-  );
+  return <BottleArt product={product || { name: alt }} className={className} />;
 }
 
 export function Pagination({ page, totalPages, onChange }) {

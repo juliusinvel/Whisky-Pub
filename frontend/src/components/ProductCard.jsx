@@ -12,7 +12,7 @@ export default function ProductCard({ product }) {
   return (
     <article className="card group flex flex-col overflow-hidden transition hover:border-amber-glow/50">
       <Link to={`/produto/${product.id}`} className="relative block aspect-[4/5] bg-peat-800/60 p-6">
-        <BottleImage src={product.imageUrl} alt={product.name} className="transition group-hover:scale-105" />
+        <BottleImage src={product.imageUrl} alt={product.name} product={product} className="transition group-hover:scale-105" />
         {product.ageYears ? (
           <span className="absolute left-3 top-3 rounded-full bg-peat-950/80 px-2.5 py-1 text-xs text-amber-glow">
             {product.ageYears} anos

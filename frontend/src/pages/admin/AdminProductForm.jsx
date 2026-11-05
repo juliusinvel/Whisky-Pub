@@ -133,7 +133,7 @@ export default function AdminProductForm() {
           <div className="card p-4">
             <p className="label">Imagem</p>
             <div className="aspect-[4/5] rounded-md bg-peat-800 p-4">
-              <BottleImage src={preview || currentImage} alt="Prévia" />
+              <BottleImage src={preview || currentImage} alt="Prévia" product={{ id, ...form }} />
             </div>
             <label className="btn btn-ghost mt-4 w-full cursor-pointer">
               {file || currentImage ? 'Trocar imagem' : 'Escolher imagem'}
