@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useLocation } from 'react-router-dom';
 
 const KEY = 'whiskypub.adult';
 
@@ -6,8 +7,10 @@ const KEY = 'whiskypub.adult';
 export default function AgeGate() {
   const [confirmed, setConfirmed] = useState(() => localStorage.getItem(KEY) === 'yes');
   const [denied, setDenied] = useState(false);
+  const { pathname } = useLocation();
 
-  if (confirmed) return null;
+  // O painel administrativo não passa pelo aviso de maioridade da loja
+  if (confirmed || pathname.startsWith('/admin')) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-peat-950/95 p-4 backdrop-blur">

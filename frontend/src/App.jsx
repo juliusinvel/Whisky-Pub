@@ -12,6 +12,7 @@ import MyOrders from './pages/store/MyOrders';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import AdminLayout from './pages/admin/AdminLayout';
+import AdminLogin from './pages/admin/AdminLogin';
 import AdminProducts from './pages/admin/AdminProducts';
 import AdminProductForm from './pages/admin/AdminProductForm';
 import AdminOrders from './pages/admin/AdminOrders';
@@ -22,6 +23,9 @@ export default function App() {
     <>
       <AgeGate />
       <Routes>
+        {/* Login do painel: endereço próprio, fora do layout da loja */}
+        <Route path="admin/login" element={<AdminLogin />} />
+
         <Route element={<Layout />}>
           {/* Loja (pública) */}
           <Route index element={<Catalog />} />

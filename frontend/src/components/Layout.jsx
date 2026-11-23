@@ -40,7 +40,7 @@ export default function Layout() {
                 className="text-sm text-muted hover:text-amber-glow"
                 onClick={() => {
                   logout();
-                  navigate('/');
+                  navigate(isAdmin ? '/admin/login' : '/');
                 }}
                 title={user.email}
               >

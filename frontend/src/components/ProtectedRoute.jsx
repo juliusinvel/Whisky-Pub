@@ -8,7 +8,11 @@ export default function ProtectedRoute({ role }) {
   const location = useLocation();
 
   if (loading) return <Spinner />;
-  if (!user) return <Navigate to="/login" replace state={{ from: location.pathname }} />;
-  if (role && user.role !== role) return <Navigate to="/" replace />;
+  // Área do admin manda para o login do painel; o resto, para o login da loja
+  const loginPath = role === 'ADMIN' ? '/admin/login' : '/login';
+  if (!user) return <Navigate to={loginPath} replace state={{ from: location.pathname }} />;
+  if (role && user.role !== role) {
+    return role === 'ADMIN' ? <Navigate to="/admin/login" replace state={{ from: location.pathname }} /> : <Navigate to="/" replace />;
+  }
   return <Outlet />;
 }

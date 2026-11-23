@@ -191,7 +191,7 @@ npm install
 npm run dev                          # http://localhost:5173
 ```
 
-Entre com o e-mail/senha de `ADMIN_*` do `.env` para acessar o painel em `/admin`. Para comprar, crie uma conta de cliente em `/cadastro`.
+O painel administrativo tem endereço próprio: **`/admin/login`** (ex.: `http://localhost:5173/admin/login`). A loja não exibe nenhum link para ele; entre com o e-mail/senha de `ADMIN_*` do `.env`. Para comprar, crie uma conta de cliente em `/cadastro`.
 
 > Em produção, rode `npm run build` no frontend e sirva a pasta `dist/`. Se a API ficar em outro domínio, defina `VITE_API_URL=https://sua-api.com/api` antes do build.
 
@@ -226,6 +226,7 @@ O payload gerado segue o padrão BR Code do Banco Central e pode ser lido por ap
 | Cliente | `/checkout` | Endereço (com preenchimento pelo CEP via ViaCEP), resumo com frete e confirmação |
 | Cliente | `/pedidos/:id` | QR Code PIX, copia e cola, contagem regressiva, "Já paguei" (simulação) e status |
 | Cliente | `/meus-pedidos` | Histórico de pedidos |
+| Admin | `/admin/login` | Login próprio do painel (não aparece na loja; contas de cliente são recusadas) |
 | Admin | `/admin` | Lista de whiskys, ativar/desativar, excluir |
 | Admin | `/admin/produtos/novo` · `/:id` | Formulário com upload e prévia da imagem |
 | Admin | `/admin/pedidos` | Pedidos por status; confirmar PIX, enviar, entregar ou cancelar |
